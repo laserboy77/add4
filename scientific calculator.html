@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            padding: 20px;
+        }
+        
+        .calculator {
+            width: 100%;
+            max-width: 400px;
+            background-color: #2c2f36;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .display {
+            padding: 20px;
+            background-color: #1e2025;
+            color: white;
+            text-align: right;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        
+        .previous-operand {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            min-height: 1.5rem;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+        
+        .current-operand {
+            font-size: 2.5rem;
+            font-weight: 300;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+        
+        button {
+            border: none;
+            outline: none;
+            padding: 15px 10px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        .number {
+            background-color: #3a3e4a;
+        }
+        
+        .number:hover {
+            background-color: #4a4e5a;
+        }
+        
+        .operator {
+            background-color: #ff9500;
+        }
+        
+        .operator:hover {
+            background-color: #ffaa33;
+        }
+        
+        .function {
+            background-color: #5c5f6b;
+        }
+        
+        .function:hover {
+            background-color: #6c6f7b;
+        }
+        
+        .equals {
+            background-color: #ff2d75;
+            grid-column: span 2;
+        }
+        
+        .equals:hover {
+            background-color: #ff4d8a;
+        }
+        
+        .clear {
+            background-color: #ff3b30;
+        }
+        
+        .clear:hover {
+            background-color: #ff5c52;
+        }
+        
+        .zero {
+            grid-column: span 2;
+        }
+        
+        .memory {
+            background-color: #007aff;
+        }
+        
+        .memory:hover {
+            background-color: #3395ff;
+        }
+        
+        .toggle {
+            background-color: #5856d6;
+        }
+        
+        .toggle:hover {
+            background-color: #6e6ce6;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 10px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 480px) {
+            .calculator {
+                max-width: 100%;
+            }
+            
+            button {
+                padding: 12px 8px;
+                font-size: 1rem;
+            }
+            
+            .current-operand {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="previous-operand"></div>
+            <div class="current-operand">0</div>
+        </div>
+        <div class="buttons">
+            <button class="function" data-action="second">2nd</button>
+            <button class="function" data-action="pi">π</button>
+            <button class="function" data-action="e">e</button>
+            <button class="clear" data-action="clear">C</button>
+            <button class="clear" data-action="delete">⌫</button>
+            
+            <button class="function" data-action="sin">sin</button>
+            <button class="function" data-action="cos">cos</button>
+            <button class="function" data-action="tan">tan</button>
+            <button class="operator" data-action="power">x<sup>y</sup></button>
+            <button class="operator" data-action="sqrt">√</button>
+            
+            <button class="function" data-action="asin">sin<sup>-1</sup></button>
+            <button class="function" data-action="acos">cos<sup>-1</sup></button>
+            <button class="function" data-action="atan">tan<sup>-1</sup></button>
+            <button class="operator" data-action="log">log</button>
+            <button class="operator" data-action="ln">ln</button>
+            
+            <button class="memory" data-action="memory-clear">MC</button>
+            <button class="memory" data-action="memory-recall">MR</button>
+            <button class="memory" data-action="memory-add">M+</button>
+            <button class="memory" data-action="memory-subtract">M-</button>
+            <button class="operator" data-action="divide">÷</button>
+            
+            <button class="number" data-number="7">7</button>
+            <button class="number" data-number="8">8</button>
+            <button class="number" data-number="9">9</button>
+            <button class="operator" data-action="multiply">×</button>
+            <button class="function" data-action="factorial">x!</button>
+            
+            <button class="number" data-number="4">4</button>
+            <button class="number" data-number="5">5</button>
+            <button class="number" data-number="6">6</button>
+            <button class="operator" data-action="subtract">-</button>
+            <button class="function" data-action="percent">%</button>
+            
+            <button class="number" data-number="1">1</button>
+            <button class="number" data-number="2">2</button>
+            <button class="number" data-number="3">3</button>
+            <button class="operator" data-action="add">+</button>
+            <button class="function" data-action="exponent">e<sup>x</sup></button>
+            
+            <button class="number zero" data-number="0">0</button>
+            <button class="number" data-action="decimal">.</button>
+            <button class="toggle" data-action="toggle">±</button>
+            <button class="equals" data-action="equals">=</button>
+        </div>
+        <div class="footer">
+            Scientific Calculator | All calculations performed in degrees
+        </div>
+    </div>
+
+    <script>
+        class Calculator {
+            constructor() {
+                this.previousOperandElement = document.querySelector('.previous-operand');
+                this.currentOperandElement = document.querySelector('.current-operand');
+                this.clear();
+                this.memory = 0;
+                this.isSecondFunction = false;
+                this.setupEventListeners();
+            }
+            
+            clear() {
+                this.currentOperand = '0';
+                this.previousOperand = '';
+                this.operation = undefined;
+                this.waitingForNewOperand = false;
+            }
+            
+            delete() {
+                if (this.waitingForNewOperand) return;
+                if (this.currentOperand.length === 1) {
+                    this.currentOperand = '0';
+                } else {
+                    this.currentOperand = this.currentOperand.slice(0, -1);
+                }
+            }
+            
+            appendNumber(number) {
+                if (this.waitingForNewOperand) {
+                    this.currentOperand = number;
+                    this.waitingForNewOperand = false;
+                } else {
+                    if (number === '.' && this.currentOperand.includes('.')) return;
+                    this.currentOperand = this.currentOperand === '0' ? number : this.currentOperand + number;
+                }
+            }
+            
+            chooseOperation(operation) {
+                if (this.currentOperand === '') return;
+                
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.waitingForNewOperand = true;
+            }
+            
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                
+                if (isNaN(prev) || isNaN(current)) return;
+                
+                switch (this.operation) {
+                    case 'add':
+                        computation = prev + current;
+                        break;
+                    case 'subtract':
+                        computation = prev - current;
+                        break;
+                    case 'multiply':
+                        computation = prev * current;
+                        break;
+                    case 'divide':
+                        computation = prev / current;
+                        break;
+                    case 'power':
+                        computation = Math.pow(prev, current);
+                        break;
+                    default:
+                        return;
+                }
+                
+                this.currentOperand = computation.toString();
+                this.operation = undefined;
+                this.previousOperand = '';
+                this.waitingForNewOperand = true;
+            }
+            
+            applyFunction(func) {
+                const current = parseFloat(this.currentOperand);
+                if (isNaN(current)) return;
+                
+                let computation;
+                
+                switch (func) {
+                    case 'sqrt':
+                        computation = Math.sqrt(current);
+                        break;
+                    case 'sin':
+                        computation = Math.sin(current * Math.PI / 180);
+                        break;
+                    case 'cos':
+                        computation = Math.cos(current * Math.PI / 180);
+                        break;
+                    case 'tan':
+                        computation = Math.tan(current * Math.PI / 180);
+                        break;
+                    case 'asin':
+                        computation = Math.asin(current) * 180 / Math.PI;
+                        break;
+                    case 'acos':
+                        computation = Math.acos(current) * 180 / Math.PI;
+                        break;
+                    case 'atan':
+                        computation = Math.atan(current) * 180 / Math.PI;
+                        break;
+                    case 'log':
+                        computation = Math.log10(current);
+                        break;
+                    case 'ln':
+                        computation = Math.log(current);
+                        break;
+                    case 'factorial':
+                        computation = this.factorial(current);
+                        break;
+                    case 'percent':
+                        computation = current / 100;
+                        break;
+                    case 'exponent':
+                        computation = Math.exp(current);
+                        break;
+                    case 'pi':
+                        computation = Math.PI;
+                        break;
+                    case 'e':
+                        computation = Math.E;
+                        break;
+                    default:
+                        return;
+                }
+                
+                this.currentOperand = computation.toString();
+                this.waitingForNewOperand = true;
+            }
+            
+            factorial(n) {
+                if (n < 0) return NaN;
+                if (n === 0 || n === 1) return 1;
+                let result = 1;
+                for (let i = 2; i <= n; i++) {
+                    result *= i;
+                }
+                return result;
+            }
+            
+            toggleSign() {
+                if (this.currentOperand === '0') return;
+                this.currentOperand = this.currentOperand.startsWith('-') 
+                    ? this.currentOperand.slice(1) 
+                    : '-' + this.currentOperand;
+            }
+            
+            memoryOperation(op) {
+                const current = parseFloat(this.currentOperand);
+                if (isNaN(current)) return;
+                
+                switch (op) {
+                    case 'memory-clear':
+                        this.memory = 0;
+                        break;
+                    case 'memory-recall':
+                        this.currentOperand = this.memory.toString();
+                        this.waitingForNewOperand = true;
+                        break;
+                    case 'memory-add':
+                        this.memory += current;
+                        break;
+                    case 'memory-subtract':
+                        this.memory -= current;
+                        break;
+                }
+            }
+            
+            toggleSecondFunction() {
+                this.isSecondFunction = !this.isSecondFunction;
+                this.updateButtonLabels();
+            }
+            
+            updateButtonLabels() {
+                const buttons = document.querySelectorAll('.function');
+                buttons.forEach(button => {
+                    const action = button.getAttribute('data-action');
+                    if (this.isSecondFunction) {
+                        switch (action) {
+                            case 'sin':
+                                button.textContent = 'sin⁻¹';
+                                button.setAttribute('data-action', 'asin');
+                                break;
+                            case 'cos':
+                                button.textContent = 'cos⁻¹';
+                                button.setAttribute('data-action', 'acos');
+                                break;
+                            case 'tan':
+                                button.textContent = 'tan⁻¹';
+                                button.setAttribute('data-action', 'atan');
+                                break;
+                            case 'log':
+                                button.textContent = '10ˣ';
+                                button.setAttribute('data-action', 'power10');
+                                break;
+                            case 'ln':
+                                button.textContent = 'eˣ';
+                                button.setAttribute('data-action', 'exponent');
+                                break;
+                        }
+                    } else {
+                        switch (action) {
+                            case 'asin':
+                                button.textContent = 'sin';
+                                button.setAttribute('data-action', 'sin');
+                                break;
+                            case 'acos':
+                                button.textContent = 'cos';
+                                button.setAttribute('data-action', 'cos');
+                                break;
+                            case 'atan':
+                                button.textContent = 'tan';
+                                button.setAttribute('data-action', 'tan');
+                                break;
+                            case 'power10':
+                                button.textContent = 'log';
+                                button.setAttribute('data-action', 'log');
+                                break;
+                        }
+                    }
+                });
+            }
+            
+            getDisplayNumber(number) {
+                const stringNumber = number.toString();
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                
+                let integerDisplay;
+                
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', {
+                        maximumFractionDigits: 0
+                    });
+                }
+                
+                if (decimalDigits != null) {
+                    return `${integerDisplay}.${decimalDigits}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+            
+            updateDisplay() {
+                this.currentOperandElement.textContent = this.getDisplayNumber(this.currentOperand);
+                
+                if (this.operation != null) {
+                    const operatorSymbols = {
+                        'add': '+',
+                        'subtract': '-',
+                        'multiply': '×',
+                        'divide': '÷',
+                        'power': '^'
+                    };
+                    
+                    this.previousOperandElement.textContent = 
+                        `${this.getDisplayNumber(this.previousOperand)} ${operatorSymbols[this.operation]}`;
+                } else {
+                    this.previousOperandElement.textContent = '';
+                }
+            }
+            
+            setupEventListeners() {
+                document.querySelectorAll('.number').forEach(button => {
+                    button.addEventListener('click', () => {
+                        if (button.hasAttribute('data-number')) {
+                            this.appendNumber(button.getAttribute('data-number'));
+                        } else if (button.hasAttribute('data-action') && 
+                                  button.getAttribute('data-action') === 'decimal') {
+                            this.appendNumber('.');
+                        }
+                        this.updateDisplay();
+                    });
+                });
+                
+                document.querySelectorAll('.operator').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const action = button.getAttribute('data-action');
+                        if (action === 'sqrt' || action === 'power') {
+                            this.applyFunction(action);
+                        } else {
+                            this.chooseOperation(action);
+                        }
+                        this.updateDisplay();
+                    });
+                });
+                
+                document.querySelectorAll('.function').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const action = button.getAttribute('data-action');
+                        if (action === 'second') {
+                            this.toggleSecondFunction();
+                        } else {
+                            this.applyFunction(action);
+                        }
+                        this.updateDisplay();
+                    });
+                });
+                
+                document.querySelectorAll('.memory').forEach(button => {
+                    button.addEventListener('click', () => {
+                        this.memoryOperation(button.getAttribute('data-action'));
+                        this.updateDisplay();
+                    });
+                });
+                
+                document.querySelector('[data-action="equals"]').addEventListener('click', () => {
+                    this.compute();
+                    this.updateDisplay();
+                });
+                
+                document.querySelector('[data-action="clear"]').addEventListener('click', () => {
+                    this.clear();
+                    this.updateDisplay();
+                });
+                
+                document.querySelector('[data-action="delete"]').addEventListener('click', () => {
+                    this.delete();
+                    this.updateDisplay();
+                });
+                
+                document.querySelector('[data-action="toggle"]').addEventListener('click', () => {
+                    this.toggleSign();
+                    this.updateDisplay();
+                });
+            }
+        }
+        
+        // Initialize the calculator
+        const calculator = new Calculator();
+    </script>
+</body>
+</html>
